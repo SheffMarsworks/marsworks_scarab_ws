@@ -6,6 +6,8 @@
     <xacro:arg name="is_ignition" default="true"/>
     <xacro:include filename="$(find rover_description)/urdf/rover_gazebo.xacro" />
     <xacro:include filename="$(find rover_description)/urdf/rover_control.xacro" />
+    <xacro:include filename="$(find rover_description)/urdf/sensors/realsense.xacro" />
+    <!-- <xacro:include filename="$(find rover_description)/urdf/sensors/imu.xacro" /> -->
 
     <link name="base_footprint"/>
 
@@ -26,7 +28,7 @@
 
 
         <visual>
-            <origin rpy="0 0 1.579795" xyz="0 0.03 0"/>
+            <origin rpy="0 0 1.579795" xyz="0 0 0"/>
             <geometry>
                 <!--<box size="1 0.6 0.3"/>-->
                 <mesh filename="package://rover_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
@@ -36,7 +38,7 @@
             </material>
         </visual>
         <collision>
-            <origin rpy="0 0 1.579795" xyz="0 0.03 0"/>
+            <origin rpy="0 0 1.579795" xyz="0 0 0"/>
             <geometry>
                 <mesh filename="package://rover_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
             </geometry>

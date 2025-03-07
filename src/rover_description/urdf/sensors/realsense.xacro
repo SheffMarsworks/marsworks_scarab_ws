@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Add realsense stl -->
+
+  <joint name="realsense_joint" type="fixed">
+    <parent link="body_link"/>
+    <child link="realsense_link"/>
+    <origin xyz="-0.36 0.0 0.08" rpy="0.0 0.0 0.0"/>
+  </joint>
+
+  <link name="realsense_link">
+    <visual>
+      <geometry>
+        <box size="0.010 0.03 0.03"/>
+      </geometry>
+      <material name="yellow">
+        <color rgba="1 1 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Optical joint will rotate the camera because it uses a different coordinate system where two axis are inverted -->
+
+  <joint name="realsense_optical_joint" type="fixed">
+    <parent link="realsense_link"/>
+    <child link="realsense_link_optical"/>
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+  </joint>
+
+  <link name="realsense_link_optical">
+  </link>
+
+  <!-- End of Optical joint -->
+
+  <!-- <gazebo reference="realsense_link">
+    <material>
+    Gazebo/Red
+    </material>
+  </gazebo> -->
+
+
+
+
+  <!-- TODO: Add 2d realsense and Depth realsense simulation -->
+
+</robot>
