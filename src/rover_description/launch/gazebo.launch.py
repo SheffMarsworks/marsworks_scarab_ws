@@ -34,6 +34,11 @@ def generate_launch_description():
     ros_distro = os.environ["ROS_DISTRO"]
     is_ignition = "True" if ros_distro == "humble" else "False"
 
+    sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time', default_value='True',
+        description='Flag to enable use_sim_time'
+    )
+
     robot_description = ParameterValue(Command([
             "xacro ",
             LaunchConfiguration("model"),
@@ -80,27 +85,56 @@ def generate_launch_description():
         ],
     )
 
-    gz_ros2_bridge = Node(
+    gz_bridge_node = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
-            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+            "/camera/image@sensor_msgs/msg/Image@gz.msgs.Image",
+            # "/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
         ],
-        remappings=[
-            ("/imu", "/imu/out"),
+        output="screen",
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+        ]
+    )
+
+    gz_image_bridge_node = Node(
+        package="ros_gz_image",
+        executable="image_bridge",
+        arguments=[
+            "/camera/image",
         ],
+        output="screen",
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time'),
+             'camera.image.compressed.jpeg_quality': 75},
+        ],
+    )
+
+    # Relay node to republish /camera/camera_info to /camera/image/camera_info
+    relay_camera_info_node = Node(
+        package='topic_tools',
+        executable='relay',
+        name='relay_camera_info',
+        output='screen',
+        arguments=['camera/camera_info', 'camera/image/camera_info'],
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+        ]
     )
 
     return LaunchDescription(
         [
             qt_qpa_platform,
+            sim_time_arg,
             model_arg,
             gazebo_resource_path,
             robot_state_publisher_node,
             gazebo,
             gz_spawn_entity,
-            gz_ros2_bridge,
+            gz_bridge_node,
+            gz_image_bridge_node,
+            relay_camera_info_node
         ]
     )
